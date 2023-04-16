@@ -1,6 +1,6 @@
 import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtGraphicalEffects 1.15
+import QtQuick.Controls.Basic
+//import QtGraphicalEffects 1.15
 
 Button{
     id: btnTopBar
@@ -41,12 +41,29 @@ Button{
             antialiasing: false
         }
 
-        ColorOverlay{
-            anchors.fill: iconBtn
-            source: iconBtn
-            color: "#ffffff"
-            antialiasing: false
-        }
+//        ColorOverlay{
+//            anchors.fill: iconBtn
+//            source: iconBtn
+//            color: "#ffffff"
+//            antialiasing: false
+//        }
+
+//        ShaderEffect {
+//            anchors.fill: iconBtn
+//            property variant src: iconBtn
+//            property color overlayColor: "#ffffff"
+
+//            fragmentShader: "
+//                uniform lowp sampler2D src;
+//                uniform lowp vec4 overlayColor;
+//                varying lowp vec2 qt_TexCoord0;
+
+//                void main() {
+//                    lowp vec4 baseColor = texture2D(src, qt_TexCoord0);
+//                    lowp vec4 finalColor = vec4(overlayColor.rgb, baseColor.a);
+//                    gl_FragColor = mix(baseColor, finalColor, finalColor.a);
+//                }"
+//        }
     }
 }
 

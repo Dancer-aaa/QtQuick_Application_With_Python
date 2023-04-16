@@ -1,9 +1,10 @@
+import QtCore
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
-import QtGraphicalEffects 1.15
+//import QtGraphicalEffects 1.15
 import "controls"
-import QtQuick.Dialogs 1.3
+import QtQuick.Dialogs
 
 Window {
     id: mainWindow
@@ -47,7 +48,7 @@ Window {
                 resizeRight.visible = false
                 resizeBottom.visible = false
                 resizeWindow.visible = false
-                btnMaximizeRestore.btnIconSource = "../images/svg_images/restore_icon.svg"
+                btnMaximizeRestore.btnIconSource = "../../images/svg_images/restore_icon.svg"
             }
             else{
                 mainWindow.showNormal()
@@ -55,7 +56,7 @@ Window {
                 windowMargin = 10
                 // Resize visibility
                 internal.resetResizeBorders()
-                btnMaximizeRestore.btnIconSource = "../images/svg_images/maximize_icon.svg"
+                btnMaximizeRestore.btnIconSource = "../../images/svg_images/maximize_icon.svg"
             }
         }
 
@@ -66,7 +67,7 @@ Window {
                 windowMargin = 10
                 // Resize visibility
                 internal.resetResizeBorders()
-                btnMaximizeRestore.btnIconSource = "../images/svg_images/maximize_icon.svg"
+                btnMaximizeRestore.btnIconSource = "../../images/svg_images/maximize_icon.svg"
             }
         }
 
@@ -75,7 +76,7 @@ Window {
             windowMargin = 10
             // Resize visibility
             internal.resetResizeBorders()
-            btnMaximizeRestore.btnIconSource = "../images/svg_images/maximize_icon.svg"
+            btnMaximizeRestore.btnIconSource = "../../images/svg_images/maximize_icon.svg"
         }
     }
 
@@ -230,14 +231,14 @@ Window {
 
                     TopBarButton {
                         id: btnMaximizeRestore
-                        btnIconSource: "../images/svg_images/maximize_icon.svg"
+                        btnIconSource: "../../images/svg_images/maximize_icon.svg"
                         onClicked: internal.maximizeRestore()
                     }
 
                     TopBarButton {
                         id: btnClose
                         btnColorClicked: "#ff007f"
-                        btnIconSource: "../images/svg_images/close_icon.svg"
+                        btnIconSource: "../../images/svg_images/close_icon.svg"
                         onClicked: mainWindow.close()
                     }
                 }
@@ -301,7 +302,7 @@ Window {
                             id: btnOpen
                             width: leftMenu.width
                             text: qsTr("Open")
-                            btnIconSource: "../images/svg_images/open_icon.svg"
+                            btnIconSource: "../../images/svg_images/open_icon.svg"
 
                             onPressed: {
                                 fileOpen.open()
@@ -310,8 +311,8 @@ Window {
                             FileDialog{
                                 id: fileOpen
                                 title: "Please choose a file"
-                                folder: shortcuts.home
-                                selectMultiple: false
+                                fileMode: FileDialog.OpenFile
+                                currentFolder: StandardPaths.standardLocations(StandardPaths.HomeLocation)[0]
                                 nameFilters: ["Text File (*.txt)"]
                                 onAccepted: {
                                     backend.openFile(fileOpen.fileUrl)
@@ -323,7 +324,7 @@ Window {
                             id: btnSave
                             width: leftMenu.width
                             text: qsTr("Save")
-                            btnIconSource: "../images/svg_images/save_icon.svg"
+                            btnIconSource: "../../images/svg_images/save_icon.svg"
 
                             onPressed: {
                                 fileSave.open()
@@ -332,12 +333,20 @@ Window {
                             FileDialog{
                                 id: fileSave
                                 title: "Save file"
-                                folder: shortcuts.home
+                                fileMode: FileDialog.SaveFile
+                                currentFolder: StandardPaths.standardLocations(StandardPaths.HomeLocation)[0]
                                 nameFilters: ["Text File (*.txt)"]
-                                selectExisting: false
                                 onAccepted: {
-                                    backend.getTextField(actualPage.getText)
-                                    backend.writeFile(fileSave.fileUrl)
+                                    if (stackView.currentItem !== null) {
+                                        backend.getTextField(stackView.currentItem.getText)
+                                        if (fileSave.fileUrl !== undefined) {
+                                            backend.writeFile(fileSave.fileUrl.toString())
+                                        } else {
+                                            console.log("File URL is undefined")
+                                        }
+                                    } else {
+                                        console.log("No item is currently loaded in the stackView")
+                                    }
                                 }
                             }
                         }
@@ -349,7 +358,7 @@ Window {
                         text: qsTr("Settings")
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 25
-                        btnIconSource: "../images/svg_images/settings_icon.svg"
+                        btnIconSource: "../../images/svg_images/settings_icon.svg"
                         onClicked: {
                             btnHome.isActiveMenu = false
                             btnSettings.isActiveMenu = true
@@ -445,16 +454,57 @@ Window {
     }
 
 
-    DropShadow{
-        anchors.fill: bg
-        horizontalOffset: 0
-        verticalOffset: 0
-        radius: 10
-        samples: 16
-        color: "#80000000"
-        source: bg
-        z: 0
-    }
+//    ShaderEffect {
+//        anchors.fill: bg
+//        horizontalOffset: 0
+//        verticalOffset: 0
+//        radius: 10
+//        samples: 16
+//        color: "#80000000"
+//        source: bg
+//        z: 0
+//    }
+
+//    ShaderEffect {
+//        id: shadowEffect
+//        anchors.fill: bg
+//        property variant source: bg
+
+//        fragmentShader: "
+//            uniform sampler2D source;
+//            varying vec2 qt_TexCoord0;
+//            uniform lowp float qt_Opacity;
+
+//            vec4 gaussian(vec2 p, float r) {
+//                float d = length(p * r);
+//                return exp(-d * d * 0.5);
+//            }
+
+//            void main() {
+//                vec2 uv = qt_TexCoord0;
+//                vec4 col = texture2D(source, uv);
+//                vec2 offset = vec2(0.0, 0.0); // You can adjust this to change the shadow offset
+//                vec2 tc = uv - offset;
+
+//                float r = 10.0; // You can adjust this to change the shadow radius
+//                float s = 16.0; // You can adjust this to change the shadow samples
+
+//                float wsum = 0.0;
+//                vec4 result = vec4(0.0);
+//                for (float x = -r; x <= r; x += s) {
+//                    for (float y = -r; y <= r; y += s) {
+//                        vec4 sample = gaussian(vec2(x, y), r) * texture2D(source, tc + vec2(x, y) / source.size);
+//                        result += sample;
+//                        wsum += sample.a;
+//                    }
+//                }
+//                result /= wsum;
+//                result.rgb *= vec3(0.0, 0.0, 0.0); // Shadow color
+//                result.a *= 0.5; // You can adjust this to change the shadow opacity
+//                gl_FragColor = mix(result, col, col.a) * qt_Opacity;
+//            }
+//        "
+//    }
 
     MouseArea {
         id: resizeLeft

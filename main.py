@@ -3,9 +3,9 @@ import sys
 import os
 import datetime
 
-from PySide2.QtGui import QGuiApplication
-from PySide2.QtQml import QQmlApplicationEngine
-from PySide2.QtCore import QObject, Slot, Signal, QTimer, QUrl
+from PySide6.QtGui import QGuiApplication
+from PySide6.QtQml import QQmlApplicationEngine
+from PySide6.QtCore import QObject, Slot, Signal, QTimer, QUrl
 
 class MainWindow(QObject):
     def __init__(self):
@@ -47,10 +47,13 @@ class MainWindow(QObject):
 
     # Write File
     @Slot(str)
-    def writeFile(self, filePath):
-        file = open(QUrl(filePath).toLocalFile(), "w")
-        file.write(self.textField)
-        file.close()
+    def writeFile(self, fileUrlString):
+        fileUrl = QUrl(fileUrlString)
+        localFilePath = fileUrl.toLocalFile()
+
+        with open(localFilePath, "w") as file:
+            file.write(self.textField)
+
         print(self.textField)
 
     # Show / Hide Rectangle
@@ -89,4 +92,4 @@ if __name__ == "__main__":
 
     if not engine.rootObjects():
         sys.exit(-1)
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
